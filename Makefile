@@ -4,11 +4,11 @@ TARGET = app
 
 all: $(TARGET)
 
-$(TARGET): src/app.o
+$(TARGET): src/app.cpp src/game.cpp
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 clean:
-	rm src/*.o $(TARGET)
+	rm src/*.o *.o $(TARGET)
 
 run:
 	@./app
