@@ -1,20 +1,18 @@
 #pragma once
 
 #include <optional>
+#include <sys/time.h>
 
-#include "termios.h"
+#include "utils.hpp"
 #include "game.hpp"
 
 class App {
 public:
-  App(int size);
-
-  ~App();
+  App() = default;
 
   void play();
 
-private:
-  Game m_game;
-  struct termios m_term;
+private:  
+  TerminalMode m_term;
 };
 

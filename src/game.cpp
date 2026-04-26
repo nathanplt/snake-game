@@ -1,6 +1,8 @@
 #include <iostream>
 #include <random>
 #include <vector>
+
+#include "utils.hpp"
 #include "types.hpp"
 #include "game.hpp"
 
@@ -22,14 +24,15 @@ void Game::reset(int size) {
   generate_fruit();
 }
 
-GameState Game::tick(Dir move) {
+GameState Game::tick(std::optional<char> move_chr) {
   if (m_state != GameState::ONGOING) {
     return GameState::ERROR;
   }
-  if (!is_valid_dir(move) || move == Dir::SAME) {
+  
+  Dir move = move_chr ? char_to_dir(move_chr.value()) : m_direction;
+  if (!is_valid_dir(move)) {
     move = m_direction;
   }
-
   m_direction = move;
 
   Coord next_pos = next_coord(m_snake.front(), move);
@@ -56,26 +59,29 @@ GameState Game::tick(Dir move) {
 }
 
 void Game::render() const {
-  static const char DEFAULT_CHR = '.';
-  static const char SNAKE_CHR = 'S';
-  static const char FRUIT_CHR = 'F';  
-
-  std::vector<std::vector<char>> board(m_size, std::vector<char>(m_size, DEFAULT_CHR));
+  std::vector<std::vector<char>> board(m_size,
+    std::vector<char>(m_size, BLANK_CHR));
 
   board[m_fruit.y][m_fruit.x] = FRUIT_CHR;
   for (const auto& [x, y] : m_snake_coords) {
     board[y][x] = SNAKE_CHR;
   }
 
-  for (int i = m_size - 1; i >= 0; --i) {
-    for (int j = 0; j < m_size; ++j) {
-      std::cout << board[i][j] << " ";
+  int expand_factor = 2;
+  std::vector<std::vector<char>> output = expand_board(board, expand_factor);
+
+  for (int i = output.size() - 1; i >= 0; --i) {
+    for (int j = 0; j < output.size(); ++j) {
+      std::cout << output[i][j] << " ";
     }
     std::cout << '\n';
   }
+
+  std::cout << '\n' << "SCORE: " << m_score << '\n' << '\n';
 }
 
 int Game::get_score() const { return m_score; }
+
 
 void Game::generate_fruit() {
   Coord prev_coord = m_fruit;
@@ -96,16 +102,6 @@ bool Game::is_valid_dir(Dir move) const {
   return move != m_direction && move != opposite_dir(m_direction);
 }
 
-Dir Game::opposite_dir(Dir d) const {
-  switch (d) {
-    case Dir::UP: return Dir::DOWN;
-    case Dir::DOWN: return Dir::UP;
-    case Dir::RIGHT: return Dir::LEFT;
-    case Dir::LEFT: return Dir::RIGHT;
-  }
-  return m_direction;
-}
-
 bool Game::is_collision(const Coord& pos) const {
   return pos.x < 0 ||
          pos.y < 0 ||
@@ -122,4 +118,25 @@ Coord Game::next_coord(const Coord& curr, Dir move) const {
     case Dir::LEFT: return {curr.x - 1, curr.y};
   }
   return curr;
+}
+
+std::vector<std::vector<char>> Game::expand_board(const std::vector<std::vector<char>>& board,
+                                                  int mult) const {
+  int n = board.size();
+  int m = board[0].size();
+
+  std::vector<std::vector<char>> new_board(n * mult,
+    std::vector<char>(m * mult));
+
+  for (int i = 0; i < n; ++i) {
+    for (int j = 0; j < m; ++j) {
+      for (int r = i * mult; r < i * mult + mult; ++r) {
+        for (int c = j * mult; c < j * mult + mult; ++c) {
+          new_board[r][c] = board[i][j];
+        }
+      }
+    }
+  }
+
+  return new_board;
 }

@@ -12,7 +12,6 @@ enum class Dir {
   DOWN,
   RIGHT,
   LEFT,
-  SAME
 };
 
 struct Coord {

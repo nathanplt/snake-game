@@ -9,31 +9,44 @@
 
 /* Terminal utils*/
 
-void set_raw_term(struct termios &orig_termios) {
-  tcgetattr(STDIN_FILENO, &orig_termios);
-  struct termios raw = orig_termios;
-  raw.c_lflag &= ~(ECHO | ICANON);
-  tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
+TerminalMode::~TerminalMode() {
+  if (m_raw && m_saved) {
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &m_term);
+  }
 }
 
-void reset_term_mode(struct termios &orig_termios) {
-  tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
+void TerminalMode::enable_raw() {
+  if (m_raw) return;
+
+  if (!m_saved) {
+    tcgetattr(STDIN_FILENO, &m_term);
+    m_saved = true;
+  }
+
+  termios raw_term = m_term;
+  raw_term.c_lflag &= ~(ECHO | ICANON);
+  tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw_term);
+
+  m_raw = true;
+}
+
+void TerminalMode::disable_raw() {
+  if (!m_raw) return;
+
+  tcsetattr(STDIN_FILENO, TCSAFLUSH, &m_term);
+  m_raw = false;
 }
 
 void clear_screen() {
   std::cout << "\033[2J\033[1;1H";
 }
 
-std::optional<char> get_char() {
+std::optional<char> get_char(struct timeval& timeout) {
   fd_set set;
-  struct timeval timeout;
   int rv;
 
   FD_ZERO(&set);
   FD_SET(STDIN_FILENO, &set);
-
-  timeout.tv_sec = 0;
-  timeout.tv_usec = 130000;
 
   rv = select(STDIN_FILENO + 1, &set, NULL, NULL, &timeout);
 
@@ -53,7 +66,17 @@ Dir char_to_dir(char c) {
     case 'W': return Dir::UP;
     case 'S': return Dir::DOWN;
     case 'D': return Dir::RIGHT;
-    case 'A': return Dir::LEFT;
+    case 'A':
+    default: return Dir::LEFT;
   }
-  return Dir::SAME;
+}
+
+Dir opposite_dir(Dir d) {
+  switch (d) {
+    case Dir::UP: return Dir::DOWN;
+    case Dir::DOWN: return Dir::UP;
+    case Dir::RIGHT: return Dir::LEFT;
+    case Dir::LEFT: 
+    default: return Dir::RIGHT;
+  }
 }
