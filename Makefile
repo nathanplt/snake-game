@@ -1,16 +1,18 @@
 CXX = clang++
-CXXFLAGS =
-TARGET = app
+CXXFLAGS = -std=c++17
+TARGET = game
+
+SRC = main.cpp src/app.cpp src/game.cpp src/utils.cpp
 
 all: $(TARGET)
 
-$(TARGET): src/app.cpp src/game.cpp
+$(TARGET): $(SRC)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 clean:
-	rm src/*.o *.o $(TARGET)
+	@rm src/*.o *.o $(TARGET) 2>/dev/null
 
 run:
-	@./app
+	@./game
 
 PHONY: clean run

@@ -15,10 +15,10 @@ void Game::reset(int size) {
   m_direction = Dir::RIGHT;
 
   m_snake.clear();
-  m_snake.push_front({DEFAULT_X, DEFAULT_Y});
+  m_snake.push_front({DEFAULT_X, m_size / 2});
 
   m_snake_coords.clear();
-  m_snake_coords.insert({DEFAULT_X, DEFAULT_Y});
+  m_snake_coords.insert({DEFAULT_X, m_size / 2});
   generate_fruit();
 }
 
@@ -26,7 +26,7 @@ GameState Game::tick(Dir move) {
   if (m_state != GameState::ONGOING) {
     return GameState::ERROR;
   }
-  if (!is_valid_dir(move)) {
+  if (!is_valid_dir(move) || move == Dir::SAME) {
     move = m_direction;
   }
 

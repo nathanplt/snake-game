@@ -1,5 +1,4 @@
-#ifndef GAME_H_
-#define GAME_H_
+#pragma once
 
 #include <deque>
 #include <set>
@@ -21,7 +20,6 @@ int get_score() const;
 private:
   static const int DEFAULT_SIZE = 15;
   static const int DEFAULT_X = 1;
-  static const int DEFAULT_Y = 8;
 
   void generate_fruit();
   Coord generate_coord() const;
@@ -43,4 +41,3 @@ private:
   std::set<Coord> m_snake_coords;
 };
 
-#endif  // GAME_H_

@@ -1,23 +1,20 @@
 #include <iostream>
+#include <optional>
+
+#include "app.hpp"
 #include "game.hpp"
+#include "utils.hpp"
 #include "types.hpp"
 
-Dir char_to_dir(char c) {
-  switch (toupper(c)) {
-    case 'U': 
-    case 'S': return Dir::UP;
-    case 'D': 
-    case 'X': return Dir::DOWN;
-    case 'R': 
-    case 'C': return Dir::RIGHT;
-    case 'L': 
-    case 'Z': return Dir::LEFT;
-  }
-  return Dir::UP;
+App::App(int size)
+ : m_game(size)  {
 }
 
-int main() {
-  Game game;
+App::~App() {
+  reset_term_mode(m_term);
+}
+
+void App::play() {
   bool is_playing = true;
 
   while (is_playing) {
@@ -26,48 +23,44 @@ int main() {
     std::cin.ignore();
 
     bool in_game = true;
+    set_raw_term(m_term);
 
     while (in_game) {
-      game.render();
-      std::cout << "ENTER MOVE (U/D/L/R): ";
+      clear_screen();
+      m_game.render();
 
-      char move_chr;
-      std::cin >> move_chr;
+      std::optional<char> move_chr = get_char();
+      if (!move_chr) {
+        move_chr.emplace('X');
+      }
 
-      Dir move = char_to_dir(move_chr);
-      GameState result = game.tick(move);
+      Dir move = char_to_dir(move_chr.value());
+      GameState result = m_game.tick(move);
 
       if (result == GameState::ONGOING) {
         continue;
-      } else if (result == GameState::LOST) {
-        std::cout << "OOPS! Snake collided and died..." << '\n'
-                  << "You ended with score: " << game.get_score() << '\n'
-                  << "Replay? (Y/N) ";
+      } else {
+        reset_term_mode(m_term);
+
+        if (result == GameState::LOST) {
+          std::cout << "OOPS! Snake collided and died..." << '\n';
+        } else if (result == GameState::WON) {
+          std::cout << "Congrats! You ate all the fruit." << '\n';
+        }
+
+        std::cout << "You ended with score: " << m_game.get_score() << '\n'
+                   << "Replay? (Y/N) ";
         
         char input;
         std::cin >> input;
 
         if (toupper(input) == 'Y') {
-          game.reset();
+          m_game.reset();
+          set_raw_term(m_term);
         } else {
           is_playing = false;
         }
 
-        in_game = false;
-      } else if (result == GameState::WON) {
-        std::cout << "Congrats! You ate all the fruit." << '\n'
-                  << "You ended with score: " << game.get_score() << '\n'
-                  << "Replay? (Y/N) ";
-
-        char input;
-        std::cin >> input;
-
-        if (toupper(input) == 'Y') {
-          game.reset();
-        } else {
-          is_playing = false;
-        }
-        
         in_game = false;
       }
     }
