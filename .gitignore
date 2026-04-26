@@ -1,5 +1,6 @@
-# object files
+# build files
 *.o
+game
 
 # vscode
 .vscode/

@@ -17,13 +17,18 @@ void App::play() {
   int size;
   std::cin >> size;
 
-  Game m_game(size);
-  bool is_playing = true;
+  std::cout << "ENTER FRAME TIME (ms): ";
 
-  const auto frame_time = std::chrono::milliseconds(110);
+  int frame_time_int;
+  std::cin >> frame_time_int;
+
+  const auto frame_time = std::chrono::milliseconds(frame_time_int);
   timeval timeout;
   timeout.tv_sec = 0;
-  timeout.tv_usec = 110000;
+  timeout.tv_usec = frame_time_int * 1000;
+
+  Game m_game(size);
+  bool is_playing = true;
 
   while (is_playing) {
     std::cin.ignore();

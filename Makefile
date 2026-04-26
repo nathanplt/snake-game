@@ -1,5 +1,5 @@
 CXX = clang++
-CXXFLAGS = -std=c++17
+CXXFLAGS = -std=c++17 -O3
 TARGET = game
 
 SRC = main.cpp src/app.cpp src/game.cpp src/utils.cpp
