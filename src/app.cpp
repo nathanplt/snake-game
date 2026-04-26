@@ -68,7 +68,7 @@ void App::play() {
         m_term.disable_raw();
 
         if (result == GameState::LOST) {
-          std::cout << "OOPS! Snake collided and died..." << '\n';
+          std::cout << "OH NO! Snake collided and died..." << '\n';
         } else if (result == GameState::WON) {
           std::cout << "Congrats! You ate all the fruit." << '\n';
         }
