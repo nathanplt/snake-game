@@ -11,27 +11,38 @@
 
 void App::play() {
   clear_screen();
-  std::cout << "WELCOME TO TERMINAL SNAKE GAME" << '\n'
-            << "ENTER BOARD SIZE: ";
+  std::cout << "WELCOME TO TERMINAL SNAKE GAME" << '\n';
 
   int size;
-  std::cin >> size;
 
-  std::cout << "ENTER FRAME TIME (ms): ";
-
-  int frame_time_int;
-  std::cin >> frame_time_int;
-
-  const auto frame_time = std::chrono::milliseconds(frame_time_int);
+  std::chrono::milliseconds frame_time; 
   timeval timeout;
-  timeout.tv_sec = 0;
-  timeout.tv_usec = frame_time_int * 1000;
 
-  Game m_game(size);
+  Game m_game;
   bool is_playing = true;
+  bool reconfigure = true;
 
   while (is_playing) {
-    std::cin.ignore();
+    clear_screen();
+
+    if (reconfigure) {
+      std::cout << "ENTER BOARD SIZE (recom. 15): ";
+      std::cin >> size;
+
+      std::cout << "ENTER FRAME TIME (recom. 120 ms): ";
+
+      int frame_time_int;
+      std::cin >> frame_time_int;
+
+      frame_time = std::chrono::milliseconds(frame_time_int);
+      timeout.tv_sec = 0;
+      timeout.tv_usec = frame_time_int * 1000;
+
+      reconfigure = false;
+    }
+
+    m_game.reset(size);
+
     std::cout << '\n' << "PRESS ENTER TO PLAY" << '\n';
     std::cin.ignore();
 
@@ -64,6 +75,7 @@ void App::play() {
       if (result == GameState::ONGOING) {
         std::this_thread::sleep_until(frame_start + frame_time);
         continue;
+
       } else {
         m_term.disable_raw();
 
@@ -78,10 +90,15 @@ void App::play() {
         char input;
         std::cin >> input;
 
-        if (toupper(input) == 'Y') {
-          m_game.reset(size);
-        } else {
+        if (toupper(input) != 'Y') {
           is_playing = false;
+        } else {
+          std::cout << "Reconfigure? (Y/N) ";
+          std::cin >> input;
+
+          if (toupper(input) == 'Y') {
+            reconfigure = true;
+          }
         }
 
         in_game = false;

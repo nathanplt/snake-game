@@ -1,6 +1,7 @@
 #include <iostream>
 #include <random>
 #include <vector>
+#include <string>
 
 #include "utils.hpp"
 #include "types.hpp"
@@ -59,16 +60,17 @@ GameState Game::tick(std::optional<char> move_chr) {
 }
 
 void Game::render() const {
-  std::vector<std::vector<char>> board(m_size,
-    std::vector<char>(m_size, BLANK_CHR));
+  std::vector<std::vector<std::string>> board(m_size,
+    std::vector<std::string>(m_size, BLANK_CHR));
 
   board[m_fruit.y][m_fruit.x] = FRUIT_CHR;
   for (const auto& [x, y] : m_snake_coords) {
-    board[y][x] = SNAKE_CHR;
+    board[y][x] = BODY_CHR;
   }
+  board[m_snake.front().y][m_snake.front().x] = HEAD_CHR;
 
   int expand_factor = 2;
-  std::vector<std::vector<char>> output = expand_board(board, expand_factor);
+  std::vector<std::vector<std::string>> output = expand_board(board, expand_factor);
 
   for (int i = output.size() - 1; i >= 0; --i) {
     for (int j = 0; j < output.size(); ++j) {
@@ -94,7 +96,7 @@ void Game::generate_fruit() {
 Coord Game::generate_coord() const {
   static std::random_device rd;
   static std::mt19937 generator(rd());
-  static std::uniform_int_distribution<> distr(0, m_size - 1);
+  std::uniform_int_distribution<> distr(0, m_size - 1);
   return {distr(generator), distr(generator)};
 }
 
@@ -120,13 +122,13 @@ Coord Game::next_coord(const Coord& curr, Dir move) const {
   return curr;
 }
 
-std::vector<std::vector<char>> Game::expand_board(const std::vector<std::vector<char>>& board,
-                                                  int mult) const {
+std::vector<std::vector<std::string>> Game::expand_board(const std::vector<std::vector<std::string>>& board,
+                                                         int mult) const {
   int n = board.size();
   int m = board[0].size();
 
-  std::vector<std::vector<char>> new_board(n * mult,
-    std::vector<char>(m * mult));
+  std::vector<std::vector<std::string>> new_board(n * mult,
+    std::vector<std::string>(m * mult));
 
   for (int i = 0; i < n; ++i) {
     for (int j = 0; j < m; ++j) {

@@ -4,6 +4,7 @@
 #include <vector>
 #include <deque>
 #include <set>
+#include <string>
 
 #include "types.hpp"
 
@@ -24,12 +25,13 @@ private:
   static const int DEFAULT_SIZE = 15;
   static const int DEFAULT_X = 1;
 
-  inline static const char BLANK_CHR = '.';
-  inline static const char SNAKE_CHR = 'S';
-  inline static const char FRUIT_CHR = 'F';  
+  inline static const std::string BLANK_CHR = "·";
+  inline static const std::string BODY_CHR = "o";
+  inline static const std::string HEAD_CHR = "O";
+  inline static const std::string FRUIT_CHR = "*";
 
-  std::vector<std::vector<char>> expand_board(const std::vector<std::vector<char>>& board,
-                                              int mult) const;
+  std::vector<std::vector<std::string>> expand_board(const std::vector<std::vector<std::string>>& board,
+                                                     int mult) const;
 
   void generate_fruit();
   Coord generate_coord() const;
