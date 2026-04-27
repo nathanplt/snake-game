@@ -7,7 +7,8 @@
 #include "types.hpp"
 #include "game.hpp"
 
-Game::Game(int size) {
+Game::Game(int size)
+ : m_high_score(0) {
   reset(size); 
 }
 
@@ -46,6 +47,7 @@ GameState Game::tick(std::optional<char> move_chr) {
 
   if (next_pos == m_fruit) {
     ++m_score;
+    m_high_score = std::max(m_high_score, m_score);
     generate_fruit();
   } else {
     m_snake_coords.erase(m_snake.back());
@@ -67,6 +69,7 @@ void Game::render() const {
   for (const auto& [x, y] : m_snake_coords) {
     board[y][x] = BODY_CHR;
   }
+  board[m_snake.back().y][m_snake.back().x] = TAIL_CHR;
   board[m_snake.front().y][m_snake.front().x] = HEAD_CHR;
 
   int expand_factor = 2;
@@ -79,7 +82,9 @@ void Game::render() const {
     std::cout << '\n';
   }
 
-  std::cout << '\n' << "SCORE: " << m_score << '\n' << '\n';
+  std::cout << '\n' << "SCORE: " << m_score
+            << '\n' << "HIGH SCORE: " << m_high_score
+            << '\n' << '\n';
 }
 
 int Game::get_score() const { return m_score; }

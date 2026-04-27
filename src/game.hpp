@@ -28,6 +28,7 @@ private:
   inline static const std::string BLANK_CHR = "·";
   inline static const std::string BODY_CHR = "o";
   inline static const std::string HEAD_CHR = "O";
+  inline static const std::string TAIL_CHR = "o";
   inline static const std::string FRUIT_CHR = "*";
 
   std::vector<std::vector<std::string>> expand_board(const std::vector<std::vector<std::string>>& board,
@@ -43,6 +44,7 @@ private:
 
   int m_size;
   int m_score;
+  int m_high_score;
 
   GameState m_state;
   Coord m_fruit;

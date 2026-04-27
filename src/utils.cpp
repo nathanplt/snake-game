@@ -7,7 +7,7 @@
 
 #include "utils.hpp"
 
-/* Terminal utils*/
+/* Terminal utils */
 
 TerminalMode::~TerminalMode() {
   if (m_raw && m_saved) {
