@@ -29,7 +29,7 @@ void App::play() {
       std::cout << "ENTER BOARD SIZE (recom. 15): ";
       std::cin >> size;
 
-      std::cout << "ENTER FRAME TIME (recom. 120 ms): ";
+      std::cout << "ENTER FRAME TIME (recom. 100 ms): ";
 
       int frame_time_int;
       std::cin >> frame_time_int;

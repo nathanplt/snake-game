@@ -23,6 +23,7 @@ void Game::reset(int size) {
 
   m_snake_coords.clear();
   m_snake_coords.insert({DEFAULT_X, m_size / 2});
+
   generate_fruit();
 }
 
@@ -32,12 +33,11 @@ GameState Game::tick(std::optional<char> move_chr) {
   }
   
   Dir move = move_chr ? char_to_dir(move_chr.value()) : m_direction;
-  if (!is_valid_dir(move)) {
-    move = m_direction;
+  if (is_valid_dir(move)) {
+    m_direction = move;
   }
-  m_direction = move;
 
-  Coord next_pos = next_coord(m_snake.front(), move);
+  Coord next_pos = next_coord(m_snake.front(), m_direction);
   if (is_collision(next_pos)) {
     return GameState::LOST;
   }
